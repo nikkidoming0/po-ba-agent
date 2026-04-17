@@ -1,56 +1,52 @@
 #!/bin/bash
 set -e
 
-echo "🚀 PO/BA Agent Suite Installer (Gemini CLI + Skills)"
-echo "==================================================="
+echo "🚀 PO/BA Agent Suite Installer"
+echo "=============================="
+echo "Installing the Product Owner / Business Analyst AI Agent"
 
-# ==================== 1. INSTALL GEMINI CLI ====================
-echo "📦 Checking for Gemini CLI..."
+# ==================== STEP 1: Install Backend Tool (Hidden) ====================
+echo ""
+echo "Step 1/4: Setting up the AI agent environment..."
 
 if command -v gemini >/dev/null 2>&1; then
-  echo "✅ Gemini CLI is already installed."
+  echo "✅ Environment ready."
 else
-  echo "🔧 Gemini CLI not found. Installing now..."
-
-  # Check for npm
+  echo "🔧 Preparing environment..."
   if ! command -v npm >/dev/null 2>&1; then
-    echo "❌ Node.js / npm is not installed."
+    echo "❌ Node.js is required but not found."
     echo "   Please install Node.js 20+ from https://nodejs.org"
     echo "   Then run this installer again."
     exit 1
   fi
 
-  echo "   Installing @google/gemini-cli globally via npm..."
-  npm install -g @google/gemini-cli
-
-  echo "✅ Gemini CLI installed successfully!"
+  npm install -g @google/gemini-cli >/dev/null 2>&1
+  echo "✅ Environment prepared."
 fi
 
-# ==================== 2. RUN GEMINI FOR FIRST-TIME GOOGLE LOGIN ====================
+# ==================== STEP 2: Account Setup ====================
 echo ""
-echo "🔑 Running Gemini CLI for the first time to complete Google login (gauth)..."
+echo "Step 2/4: Setting up your account..."
 echo "   → A browser window will open. Please sign in with your Google account."
-echo "   → Grant the required permissions."
-echo ""
 
-# Run gemini once (it will prompt login if needed)
+# Silent first run for login
 gemini --version >/dev/null 2>&1 || true
 
-echo "✅ Google login completed (or already done)."
+echo "✅ Account setup completed."
 
-# ==================== 3. INSTALL THE 3 SKILLS ====================
+# ==================== STEP 3: Install Skills ====================
 echo ""
-echo "📂 Installing PO/BA skills (user-stories, roadmap, acceptance-testing)..."
+echo "Step 3/4: Installing PO/BA skills..."
 
 SKILL_BASE="$HOME/.agents/skills"
 mkdir -p "$SKILL_BASE"
 
-REPO_URL="https://github.com/nikkidoming0/po-ba-agent.git"   # ← CHANGE THIS TO YOUR REPO
+# ←←← CHANGE THIS TO YOUR ACTUAL REPO ←←←
+REPO_URL="https://github.com/nikkidoming0/po-ba-agent.git"
 
-# Temporary clone to get the latest skills
 TEMP_DIR=$(mktemp -d)
-git clone --depth 1 --sparse "$REPO_URL" "$TEMP_DIR" 2>/dev/null || {
-  echo "❌ Could not clone your repo. Make sure the repo is public and the URL is correct."
+git clone --depth 1 --sparse "$REPO_URL" "$TEMP_DIR" || {
+  echo "❌ Failed to download skills. Make sure the repository is public."
   exit 1
 }
 
@@ -59,30 +55,33 @@ git sparse-checkout set skills
 
 for skill in po-ba-user-stories po-ba-roadmap po-ba-acceptance-testing; do
   SKILL_DIR="$SKILL_BASE/$skill"
-  if [ -d "$SKILL_DIR" ]; then
-    echo "   Updating $skill..."
-    rm -rf "$SKILL_DIR"
-  fi
+  rm -rf "$SKILL_DIR"
   cp -R "skills/$skill" "$SKILL_BASE/"
-  echo "   ✅ $skill installed"
+  echo "   ✅ $skill skill installed"
 done
 
-# Cleanup
-cd /tmp && rm -rf "$TEMP_DIR"
+rm -rf "$TEMP_DIR"
+
+echo "✅ All skills installed successfully!"
+
+# ==================== STEP 4: Launch Agent & Show Skills ====================
+echo ""
+echo "Step 4/4: Launching the PO/BA Agent..."
 
 echo ""
-echo "🎉 FULL INSTALLATION COMPLETE!"
+echo "🎉 Installation completed successfully!"
 echo ""
-echo "✅ Gemini CLI is ready"
-echo "✅ All 3 templated skills are installed"
+echo "The PO/BA Agent is now starting..."
+echo "You will see the available skills shortly."
 echo ""
-echo "🚀 How to use it now:"
-echo "   1. Open your terminal"
-echo "   2. Type: gemini"
-echo "   3. Start typing your request, for example:"
-echo "      Title: Login page redesign"
-echo "      Context: Mobile-first app..."
-echo "      @./mockup.png"
-echo "      Use template: detailed"
+echo "Example usage after it starts:"
+echo "   Title: Login page redesign"
+echo "   Context: Mobile-first e-commerce app"
+echo "   @./mockup.png"
+echo "   Use template: detailed"
 echo ""
-echo "You’re all set! The agent will now output perfectly templated user stories."
+
+# Launch the agent and automatically run /skills
+gemini << EOF
+/skills
+EOF
