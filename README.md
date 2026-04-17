@@ -18,7 +18,13 @@ An expert Product Owner and Business Analyst skill for the Gemini CLI. This agen
 
 ### Quick Install
 
-Run the provided installation script to clone the skill into your local agents directory:
+Install the skill with a single command:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/nikkidoming0/po-ba-agent/dev/install.sh | bash
+```
+
+Alternatively, you can run the provided installation script locally:
 
 ```bash
 chmod +x install.sh
