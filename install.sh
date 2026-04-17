@@ -5,48 +5,39 @@ echo "🚀 PO/BA Agent Suite Installer"
 echo "=============================="
 echo "Installing the Product Owner / Business Analyst AI Agent"
 
-# ==================== STEP 1: Install Backend Tool ====================
+# STEP 1
 echo ""
 echo "Step 1/4: Setting up the AI agent environment..."
-
-if command -v gemini >/dev/null 2>&1; then
-  echo "✅ Environment ready."
-else
-  echo "🔧 Preparing environment..."
+if ! command -v gemini >/dev/null 2>&1; then
   if ! command -v npm >/dev/null 2>&1; then
-    echo "❌ Node.js is required but not found."
-    echo "   Please install Node.js 20+ from https://nodejs.org"
-    echo "   Then run this installer again."
+    echo "❌ Node.js is required. Install from https://nodejs.org"
     exit 1
   fi
-
   npm install -g @google/gemini-cli >/dev/null 2>&1
   echo "✅ Environment prepared."
+else
+  echo "✅ Environment ready."
 fi
 
-# ==================== STEP 2: Account Setup ====================
+# STEP 2
 echo ""
 echo "Step 2/4: Setting up your account..."
-echo "   → A browser window will open. Please sign in with your Google account."
-
 gemini --version >/dev/null 2>&1 || true
 echo "✅ Account setup completed."
 
-# ==================== STEP 3: Install Skills ====================
+# STEP 3
 echo ""
 echo "Step 3/4: Installing PO/BA skills..."
-
 SKILL_BASE="$HOME/.agents/skills"
 mkdir -p "$SKILL_BASE"
 
-REPO_URL="https://github.com/nikkidoming0/po-ba-agent.git"   # ← CHANGE TO YOUR REAL REPO
+REPO_URL="https://github.com/nikkidoming0/po-ba-agent.git"   # ← CHANGE TO YOUR REPO
 
 TEMP_DIR=$(mktemp -d)
 git clone --depth 1 --sparse "$REPO_URL" "$TEMP_DIR" || {
-  echo "❌ Failed to download skills. Make sure the repository is public."
+  echo "❌ Failed to download skills. Make sure repo is public."
   exit 1
 }
-
 cd "$TEMP_DIR"
 git sparse-checkout set skills
 
@@ -56,29 +47,22 @@ for skill in po-ba-user-stories po-ba-roadmap po-ba-acceptance-testing; do
   cp -R "skills/$skill" "$SKILL_BASE/"
   echo "   ✅ $skill skill installed"
 done
-
 rm -rf "$TEMP_DIR"
-echo "✅ All skills installed successfully!"
+echo "✅ All skills installed!"
 
-# ==================== STEP 4: Launch Agent Safely ====================
+# STEP 4 – Safe Launch
 echo ""
 echo "Step 4/4: Launching the PO/BA Agent..."
 
 echo ""
-echo "🎉 Installation completed successfully!"
-echo ""
-echo "The PO/BA Agent is now starting..."
-echo "You will see the available skills shortly."
-echo ""
-echo "Example usage:"
-echo "   Title: Login page redesign"
-echo "   Context: Mobile-first e-commerce app"
-echo "   @./mockup.png"
-echo "   Use template: detailed"
+echo "🎉 Installation complete!"
+echo "Starting the agent from a safe folder..."
 echo ""
 
-# Safe launch: Always start from home directory to avoid cwd error
 cd ~
+mkdir -p ~/po-ba-agent-workspace
+cd ~/po-ba-agent-workspace
+
 gemini << EOF
 /skills
 EOF
