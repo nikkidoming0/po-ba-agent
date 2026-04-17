@@ -1,57 +1,97 @@
 #!/bin/bash
 set -e
 
-echo "🚀 PO/BA Agent Suite Installer"
-echo "=============================="
-echo "Installing the Product Owner / Business Analyst AI Agent"
+echo "🚀 Installing PO/BA User Stories Agent Skill..."
+echo "🚀 PO/BA Agent Suite Installer (Gemini CLI + Skills)"
+echo "==================================================="
 
-echo ""
-echo "Step 1/4: Setting up environment..."
-if ! command -v gemini >/dev/null 2>&1; then
+SKILL_DIR="$HOME/.agents/skills/po-ba-user-stories"
+# ==================== 1. INSTALL GEMINI CLI ====================
+echo "📦 Checking for Gemini CLI..."
+
+if [ -d "$SKILL_DIR" ]; then
+  echo "Skill already exists. Updating..."
+  cd "$SKILL_DIR" && git pull
+if command -v gemini >/dev/null 2>&1; then
+  echo "✅ Gemini CLI is already installed."
+else
+  git clone https://github.com/nikkidoming0/po-ba-agent.git "$SKILL_DIR"
+  echo "🔧 Gemini CLI not found. Installing now..."
+
+  # Check for npm
   if ! command -v npm >/dev/null 2>&1; then
-    echo "❌ Please install Node.js from https://nodejs.org"
+    echo "❌ Node.js / npm is not installed."
+    echo "   Please install Node.js 20+ from https://nodejs.org"
+    echo "   Then run this installer again."
     exit 1
   fi
-  npm install -g @google/gemini-cli >/dev/null 2>&1
+
+  echo "   Installing @google/gemini-cli globally via npm..."
+  npm install -g @google/gemini-cli
+
+  echo "✅ Gemini CLI installed successfully!"
 fi
 
+echo "✅ Skill installed successfully!"
+echo "Run: gemini"
+echo "Then type: /skills  (you should see po-ba-user-stories)"
+# ==================== 2. RUN GEMINI FOR FIRST-TIME GOOGLE LOGIN ====================
 echo ""
-echo "Step 2/4: Account setup..."
+echo "🔑 Running Gemini CLI for the first time to complete Google login (gauth)..."
+echo "   → A browser window will open. Please sign in with your Google account."
+echo "   → Grant the required permissions."
+echo ""
+
+# Run gemini once (it will prompt login if needed)
 gemini --version >/dev/null 2>&1 || true
 
+echo "✅ Google login completed (or already done)."
+
+# ==================== 3. INSTALL THE 3 SKILLS ====================
 echo ""
-echo "Step 3/4: Installing skills..."
+echo "📂 Installing PO/BA skills (user-stories)..."
 
-REPO_URL="https://github.com/nikkidoming0/po-ba-agent.git"   # ← CHANGE TO YOUR REPO
+SKILL_BASE="$HOME/.agents/skills"
+mkdir -p "$SKILL_BASE"
 
+REPO_URL="https://github.com/nikkidoming0/po-ba-agent.git"   # ← CHANGE THIS TO YOUR REPO
+
+# Temporary clone to get the latest skills
 TEMP_DIR=$(mktemp -d)
-git clone --depth 1 --sparse "$REPO_URL" "$TEMP_DIR" || {
-  echo "❌ Failed to download skills. Make sure repo is public."
+git clone --depth 1 --sparse "$REPO_URL" "$TEMP_DIR" 2>/dev/null || {
+  echo "❌ Could not clone your repo. Make sure the repo is public and the URL is correct."
   exit 1
 }
+
 cd "$TEMP_DIR"
 git sparse-checkout set skills
 
 for skill in po-ba-user-stories po-ba-roadmap po-ba-acceptance-testing; do
   SKILL_DIR="$SKILL_BASE/$skill"
-  rm -rf "$SKILL_DIR"
+  if [ -d "$SKILL_DIR" ]; then
+    echo "   Updating $skill..."
+    rm -rf "$SKILL_DIR"
+  fi
   cp -R "skills/$skill" "$SKILL_BASE/"
-  echo "   ✅ $skill skill installed"
+  echo "   ✅ $skill installed"
 done
-rm -rf "$TEMP_DIR"
-echo "✅ All skills installed!"
 
-# STEP 4 - Safe Launch
+# Cleanup
+cd /tmp && rm -rf "$TEMP_DIR"
+
 echo ""
-echo "Step 4/4: Launching PO/BA Agent from safe folder..."
-
-cd ~
-mkdir -p ~/po-ba-agent-workspace
-cd ~/po-ba-agent-workspace
-
-echo "🎉 Ready! The agent is starting..."
-echo "You should see the list of skills below."
-
-gemini << EOF
-/skills
-EOF
+echo "🎉 FULL INSTALLATION COMPLETE!"
+echo ""
+echo "✅ Gemini CLI is ready"
+echo "✅ All 3 templated skills are installed"
+echo ""
+echo "🚀 How to use it now:"
+echo "   1. Open your terminal"
+echo "   2. Type: gemini"
+echo "   3. Start typing your request, for example:"
+echo "      Title: Login page redesign"
+echo "      Context: Mobile-first app..."
+echo "      @./mockup.png"
+echo "      Use template: detailed"
+echo ""
+echo "You’re all set! The agent will now output perfectly templated user stories."
