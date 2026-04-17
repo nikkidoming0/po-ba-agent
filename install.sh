@@ -40,7 +40,7 @@ echo "✅ Google login completed (or already done)."
 
 # ==================== 3. INSTALL THE 3 SKILLS ====================
 echo ""
-echo "📂 Installing PO/BA skills (user-stories)..."
+echo "📂 Installing PO/BA skills (user-stories, roadmap, acceptance-testing)..."
 
 SKILL_BASE="$HOME/.agents/skills"
 mkdir -p "$SKILL_BASE"
