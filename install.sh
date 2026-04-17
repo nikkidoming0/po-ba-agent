@@ -9,7 +9,7 @@ if [ -d "$SKILL_DIR" ]; then
   echo "Skill already exists. Updating..."
   cd "$SKILL_DIR" && git pull
 else
-  git clone https://github.com/YOURUSERNAME/po-ba-agent-skills.git "$SKILL_DIR"
+  git clone https://github.com/nikkidoming0/po-ba-agent.git "$SKILL_DIR"
 fi
 
 echo "✅ Skill installed successfully!"
