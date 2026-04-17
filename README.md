@@ -77,11 +77,47 @@ Use this custom template:
 - AC: {{acceptance_criteria}}
 ```
 
-## Input Handling
+## Input Handling (Images & Links)
 
-- **Images:** If you attach images, the agent will analyze them with vision and include findings in the relevant sections.
-- **Links:** All provided URLs will be categorized in the References section.
-- **Clarification:** If the input is ambiguous, the agent will ask 1-2 short questions before generating the stories.
+The agent can process images and links to provide more accurate user stories and technical details.
+
+### How to provide Images
+You can provide images by dragging them into the chat or by referencing their local paths using the `@` symbol:
+
+**Example 1: Drag and Drop**
+> **Title:** New checkout flow
+> **Context:** Mobile web app, improve conversion rate
+> *[drag your screenshot or Figma export here]*
+> **Use template:** detailed
+
+**Example 2: Local File Reference**
+> **Title:** Login screen redesign
+> **Context:** Make it more secure and user-friendly
+> `@./designs/login-v2.png`
+> **Use template:** standard_user_story
+
+**Supported Image Formats:**
+- JPEG / JPG
+- PNG
+- GIF
+- WebP
+
+### How to provide Links
+Include URLs directly in your request or prefix them with "Links:". The agent will categorize them in the References section.
+
+**Example:**
+> **Title:** Social login flow
+> **Context:** Mobile-first e-commerce app. Support Google, Apple, and email/password. Must be accessible and secure.
+> `@./login-screen-mockup.png`
+> `@./figma-flow-diagram.png`
+> **Links:** https://figma.com/design/abc123
+> **Use template:** detailed
+
+## Input Processing
+
+- **Vision Analysis:** If you attach images, the agent will analyze them with vision and include findings in the relevant sections (e.g., Image Analysis or Acceptance Criteria).
+- **References:** All provided URLs and image findings will be listed in the References & Attachments section.
+- **Clarification:** If the input is ambiguous, the agent will ask 1-2 short questions BEFORE generating the stories.
 
 ---
 *Created by [nikkidoming0](https://github.com/nikkidoming0)*
