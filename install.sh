@@ -5,7 +5,7 @@ echo "🚀 PO/BA Agent Suite Installer"
 echo "=============================="
 echo "Installing the Product Owner / Business Analyst AI Agent"
 
-# ==================== STEP 1: Install Backend Tool (Hidden) ====================
+# ==================== STEP 1: Install Backend Tool ====================
 echo ""
 echo "Step 1/4: Setting up the AI agent environment..."
 
@@ -29,9 +29,7 @@ echo ""
 echo "Step 2/4: Setting up your account..."
 echo "   → A browser window will open. Please sign in with your Google account."
 
-# Silent first run for login
 gemini --version >/dev/null 2>&1 || true
-
 echo "✅ Account setup completed."
 
 # ==================== STEP 3: Install Skills ====================
@@ -41,8 +39,7 @@ echo "Step 3/4: Installing PO/BA skills..."
 SKILL_BASE="$HOME/.agents/skills"
 mkdir -p "$SKILL_BASE"
 
-# ←←← CHANGE THIS TO YOUR ACTUAL REPO ←←←
-REPO_URL="https://github.com/nikkidoming0/po-ba-agent.git"
+REPO_URL="https://github.com/nikkidoming0/po-ba-agent.git"   # ← CHANGE TO YOUR REAL REPO
 
 TEMP_DIR=$(mktemp -d)
 git clone --depth 1 --sparse "$REPO_URL" "$TEMP_DIR" || {
@@ -61,10 +58,9 @@ for skill in po-ba-user-stories po-ba-roadmap po-ba-acceptance-testing; do
 done
 
 rm -rf "$TEMP_DIR"
-
 echo "✅ All skills installed successfully!"
 
-# ==================== STEP 4: Launch Agent & Show Skills ====================
+# ==================== STEP 4: Launch Agent Safely ====================
 echo ""
 echo "Step 4/4: Launching the PO/BA Agent..."
 
@@ -74,14 +70,15 @@ echo ""
 echo "The PO/BA Agent is now starting..."
 echo "You will see the available skills shortly."
 echo ""
-echo "Example usage after it starts:"
+echo "Example usage:"
 echo "   Title: Login page redesign"
 echo "   Context: Mobile-first e-commerce app"
 echo "   @./mockup.png"
 echo "   Use template: detailed"
 echo ""
 
-# Launch the agent and automatically run /skills
+# Safe launch: Always start from home directory to avoid cwd error
+cd ~
 gemini << EOF
 /skills
 EOF
