@@ -5,31 +5,22 @@ echo "🚀 PO/BA Agent Suite Installer"
 echo "=============================="
 echo "Installing the Product Owner / Business Analyst AI Agent"
 
-# STEP 1
 echo ""
-echo "Step 1/4: Setting up the AI agent environment..."
+echo "Step 1/4: Setting up environment..."
 if ! command -v gemini >/dev/null 2>&1; then
   if ! command -v npm >/dev/null 2>&1; then
-    echo "❌ Node.js is required. Install from https://nodejs.org"
+    echo "❌ Please install Node.js from https://nodejs.org"
     exit 1
   fi
   npm install -g @google/gemini-cli >/dev/null 2>&1
-  echo "✅ Environment prepared."
-else
-  echo "✅ Environment ready."
 fi
 
-# STEP 2
 echo ""
-echo "Step 2/4: Setting up your account..."
+echo "Step 2/4: Account setup..."
 gemini --version >/dev/null 2>&1 || true
-echo "✅ Account setup completed."
 
-# STEP 3
 echo ""
-echo "Step 3/4: Installing PO/BA skills..."
-SKILL_BASE="$HOME/.agents/skills"
-mkdir -p "$SKILL_BASE"
+echo "Step 3/4: Installing skills..."
 
 REPO_URL="https://github.com/nikkidoming0/po-ba-agent.git"   # ← CHANGE TO YOUR REPO
 
@@ -50,18 +41,16 @@ done
 rm -rf "$TEMP_DIR"
 echo "✅ All skills installed!"
 
-# STEP 4 – Safe Launch
+# STEP 4 - Safe Launch
 echo ""
-echo "Step 4/4: Launching the PO/BA Agent..."
-
-echo ""
-echo "🎉 Installation complete!"
-echo "Starting the agent from a safe folder..."
-echo ""
+echo "Step 4/4: Launching PO/BA Agent from safe folder..."
 
 cd ~
 mkdir -p ~/po-ba-agent-workspace
 cd ~/po-ba-agent-workspace
+
+echo "🎉 Ready! The agent is starting..."
+echo "You should see the list of skills below."
 
 gemini << EOF
 /skills
